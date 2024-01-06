@@ -1,0 +1,52 @@
+{
+    "name": "phpfastcache/phpfastcache-devtools",
+    "type" : "library",
+    "description": "Phpfastcache development tools",
+    "keywords": ["phpfastcache", "devtools"],
+    "homepage": "https://www.phpfastcache.com",
+    "license": "MIT",
+    "readme": "README.md",
+    "minimum-stability": "dev",
+    "authors": [
+            {
+                "name": "Georges.L",
+                "email": "contact@geolim4.com",
+                "homepage": "https://github.com/Geolim4",
+                "role": "Actual Project Manager/Developer"
+            },
+            {
+                "name": "Contributors",
+                "homepage": "https://github.com/PHPSocialNetwork/phpfastcache/graphs/contributors"
+            }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "phpfastcache/phpfastcache": "@dev",
+        "ext-mbstring": "*",
+        "ext-json": "*",
+        "league/climate": "^3.8",
+        "ext-gettext": "*",
+        "phpmd/phpmd": "@stable",
+        "squizlabs/php_codesniffer": "@stable",
+        "phpstan/phpstan": "^1.5",
+        "jetbrains/phpstorm-stubs": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Phpfastcache\\Tests\\": "lib/Phpfastcache/Tests"
+        }
+    },
+    "support": {
+        "issues": "https://github.com/PHPSocialNetwork/phpfastcache/issues",
+        "wiki": "https://github.com/PHPSocialNetwork/phpfastcache/wiki",
+        "docs": "https://github.com/PHPSocialNetwork/phpfastcache/wiki",
+        "source": "https://github.com/PHPSocialNetwork/phpfastcache",
+        "security": "https://github.com/PHPSocialNetwork/phpfastcache/blob/master/SECURITY.md"
+    },
+    "funding": [
+        {
+            "type": "patreon",
+            "url": "https://www.patreon.com/geolim4"
+        }
+    ]
+}
