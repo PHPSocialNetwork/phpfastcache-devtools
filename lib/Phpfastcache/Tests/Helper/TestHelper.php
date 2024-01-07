@@ -588,7 +588,8 @@ class TestHelper
         } elseif ($exception instanceof PhpfastcacheDriverConnectException) {
             $this->assertSkip('A driver could not be initialized due to network/authentication issue: ' . $exception->getMessage());
         } else {
-            $relativeFilename = '~' . str_replace($this->getProjectDir(), '', realpath($exception->getFile()));
+            $filename = realpath($exception->getFile()) ?: $exception->getFile();
+            $relativeFilename = '~' . str_replace($this->getProjectDir(), '', $filename);
             $this->assertFail(
                 \sprintf(
                     '<red>Uncaught exception</red> <light_red>"\\%s"</light_red> <red>in</red> <light_red>"%s"</light_red> <red>line</red> <light_red>%d</light_red> <red>with message</red>: <light_red>"%s"</light_red>',
