@@ -17,9 +17,6 @@ namespace Phpfastcache\Tests\Config;
 
 
 use Phpfastcache\Config\ConfigurationOptionInterface;
-use Phpfastcache\Drivers\Arangodb\Config as ArangodbConfig;
-use Phpfastcache\Drivers\Couchdb\Config as CouchdbConfig;
-use Phpfastcache\Drivers\Mongodb\Config as MongodbConfig;
 use Phpfastcache\Drivers\Rediscluster\Config as RedisClusterConfig;
 use Phpfastcache\Helper\UninstanciableObjectTrait;
 
@@ -38,29 +35,6 @@ class ConfigFactory
     static public function getDefaultConfigs(): array
     {
         return [
-            'Arangodb' => (fn(ArangodbConfig $config) => $config->setItemDetailedDate(true)
-                /*
-                 $config->setTraceFunction(\Closure::fromCallable(static function ($type, $data) use ($testHelper){
-                   $testHelper->printDebugText(sprintf('Trace for %s: %s', strtoupper($type), $data));
-                 }));
-                */
-                ->setCollection('phpfastcache')
-                ->setAuthUser('phpfastcache')
-                ->setAuthPasswd('travis')
-                ->setDatabase('phpfastcache')
-                ->setConnectTimeout(5)
-                ->setAutoCreate(true)
-            )(new ArangodbConfig()),
-            'Couchdb' => (fn(CouchdbConfig $config) => $config->setItemDetailedDate(true)
-                ->setUsername('admin')
-                ->setPassword('travis')
-            )(new CouchdbConfig()),
-            'Mongodb' => (fn(MongodbConfig $config) => $config->setItemDetailedDate(true)
-                ->setDatabaseName('pfc_test')
-                ->setCollectionName('pfc_test')
-                ->setUsername('travis')
-                ->setPassword('test')
-            )(new MongodbConfig()),
             'RedisCluster' => (fn(RedisClusterConfig $config) => $config->setItemDetailedDate(true)
                 ->setClusters( '127.0.0.1:7001', '127.0.0.1:7002', '127.0.0.1:7003', '127.0.0.1:7004', '127.0.0.1:7005', '127.0.0.1:7006')
                 ->setSlaveFailover(\RedisCluster::FAILOVER_ERROR)

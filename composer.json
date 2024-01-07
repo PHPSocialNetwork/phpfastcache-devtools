@@ -6,7 +6,7 @@
     "homepage": "https://www.phpfastcache.com",
     "license": "MIT",
     "readme": "README.md",
-    "minimum-stability": "dev",
+    "minimum-stability": "RC",
     "authors": [
             {
                 "name": "Georges.L",
@@ -21,7 +21,7 @@
     ],
     "require": {
         "php": ">=8.0",
-        "phpfastcache/phpfastcache": "@dev",
+        "phpfastcache/phpfastcache": "^9.2.0-RC2",
         "ext-mbstring": "*",
         "ext-json": "*",
         "league/climate": "^3.8",

@@ -20,7 +20,9 @@ use Phpfastcache\Api;
 use Phpfastcache\Config\ConfigurationOptionInterface;
 use Phpfastcache\Core\Item\ExtendedCacheItemInterface;
 use Phpfastcache\Core\Pool\ExtendedCacheItemPoolInterface;
+use Phpfastcache\Event\Event;
 use Phpfastcache\Event\EventManagerInterface;
+use Phpfastcache\Event\EventReferenceParameter;
 use Phpfastcache\Exceptions\PhpfastcacheDriverCheckException;
 use Phpfastcache\Exceptions\PhpfastcacheDriverConnectException;
 use Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException;
@@ -577,6 +579,84 @@ class TestHelper
         }
     }
 
+    /**
+     * @param ExtendedCacheItemPoolInterface|PhpfastcacheAbstractProxyInterface $poolCache
+     * @return void
+     * @throws PhpfastcacheInvalidArgumentException
+     * @throws \Phpfastcache\Exceptions\PhpfastcacheUnsupportedMethodException
+     */
+    public function runGetAllItemsTests(ExtendedCacheItemPoolInterface|PhpfastcacheAbstractProxyInterface $poolCache): void
+    {
+        $poolCache->getEventManager()->on([Event::CACHE_GET_ALL_ITEMS], static function(ExtendedCacheItemPoolInterface $driver, EventReferenceParameter $referenceParameter) use (&$eventFlag){
+            $callback = $referenceParameter->getParameterValue();
+            $referenceParameter->setParameterValue(function(string $pattern) use ($callback, &$eventFlag) {
+                $eventFlag = true;
+                $this->printInfoText('The custom event Event::CACHE_GET_ALL_ITEMS has been called.');
+                return $callback($pattern);
+            });
+        });
+
+        $driverName = $poolCache->getDriverName();
+        $this->printNoteText(
+            sprintf(
+                "<blue>Testing</blue> <red>%s</red> <blue>against getAllItems() method</blue>",
+                strtoupper($driverName),
+            )
+        );
+        $eventFlag = false;
+
+        $poolCache->clear();
+        $item1 = $poolCache->getItem('cache-test1');
+        $item2 = $poolCache->getItem('cache-test2');
+        $item3 = $poolCache->getItem('cache-test3');
+
+        $item1->set('test1')->expiresAfter(3600);
+        $item2->set('test2')->expiresAfter(3600);
+        $item3->set('test3')->expiresAfter(3600);
+
+        $poolCache->saveMultiple($item1, $item2, $item3);
+        $poolCache->detachAllItems();
+        unset($item1, $item2, $item3);
+
+
+        $items = $poolCache->getAllItems();
+        $itemCount = count($items);
+        if ($itemCount === 3) {
+            $this->assertPass('getAllItems() returned 3 cache items as expected.');
+        } else {
+            $this->assertFail(sprintf('getAllItems() unexpectedly returned %d cache items.', $itemCount));
+        }
+
+        foreach ($items as $key => $item) {
+            if ($item->isHit()) {
+                $this->assertPass(sprintf('Item #%s is hit.', $item->getKey()));
+            } else {
+                $this->assertFail(sprintf('Item #%s is not hit.', $item->getKey()));
+            }
+
+            if ($key === $item->getKey()) {
+                $this->assertPass(sprintf('Cache item #%s object is identified by its cache key.', $item->getKey()));
+            } else {
+                $this->assertFail(sprintf('Cache item #%s object is identified by "%s".', $item->getKey(), $key));
+            }
+        }
+
+        $this->printNoteText("<blue>Testing getAllItems() method</blue> <yellow>(with pattern)</yellow>");
+
+        try {
+            $items = $poolCache->getAllItems('*test1*');
+            if (count($items) === 1) {
+                $this->assertPass('Found 1 item using $pattern argument');
+            } else {
+                $this->assertFail(sprintf('Found %d items using $pattern argument', count($items)));
+            }
+
+        } catch (PhpfastcacheInvalidArgumentException) {
+            $this->assertSkip("Pattern argument unsupported by $driverName driver");
+        }
+
+        $this->printNewLine();
+    }
 
     /**
      * @param Throwable $exception
