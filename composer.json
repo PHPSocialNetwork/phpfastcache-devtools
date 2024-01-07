@@ -6,7 +6,7 @@
     "homepage": "https://www.phpfastcache.com",
     "license": "MIT",
     "readme": "README.md",
-    "minimum-stability": "RC",
+    "minimum-stability": "stable",
     "authors": [
             {
                 "name": "Georges.L",

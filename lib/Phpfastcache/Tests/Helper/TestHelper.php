@@ -577,6 +577,7 @@ class TestHelper
         if($poolSize){
             $this->printInfoText('<yellow>Driver size</yellow> (approximative): <magenta>' . round($stats->getSize() / (1024 ** 2), 3) . ' Mo</magenta>');
         }
+        $this->printNewLine();
     }
 
     /**
