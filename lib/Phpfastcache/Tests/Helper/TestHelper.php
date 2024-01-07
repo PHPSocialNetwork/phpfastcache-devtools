@@ -587,7 +587,7 @@ class TestHelper
      */
     public function runGetAllItemsTests(ExtendedCacheItemPoolInterface|PhpfastcacheAbstractProxyInterface $poolCache): void
     {
-        $poolCache->getEventManager()->on([Event::CACHE_GET_ALL_ITEMS], static function(ExtendedCacheItemPoolInterface $driver, EventReferenceParameter $referenceParameter) use (&$eventFlag){
+        $poolCache->getEventManager()->on([Event::CACHE_GET_ALL_ITEMS], function(ExtendedCacheItemPoolInterface $driver, EventReferenceParameter $referenceParameter) use (&$eventFlag){
             $callback = $referenceParameter->getParameterValue();
             $referenceParameter->setParameterValue(function(string $pattern) use ($callback, &$eventFlag) {
                 $eventFlag = true;
