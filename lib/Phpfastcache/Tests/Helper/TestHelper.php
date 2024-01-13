@@ -77,11 +77,6 @@ class TestHelper
         $this->printHeaders();
     }
 
-    protected function setErrorHandler($errorLevels = E_ALL): void
-    {
-        set_error_handler([$this, 'errorHandler'], $errorLevels);
-    }
-
     public function mutePhpNotices(): void
     {
         $errorLevels = E_ALL & ~E_NOTICE & ~E_USER_NOTICE;
@@ -247,7 +242,7 @@ class TestHelper
 
         $this->printText(
             \sprintf(
-                '<blue>Test results:</blue> <%1$s> %2$s %3$s failed</%1$s>, <%4$s>%5$s %6$s skipped</%4$s> and <%7$s>%8$s %9$s passed</%7$s> out of a total of %10$s %11$s.',
+                '<blue>Test results:</blue><%1$s> %2$s %3$s failed</%1$s>, <%4$s>%5$s %6$s skipped</%4$s> and <%7$s>%8$s %9$s passed</%7$s> out of a total of %10$s %11$s.',
                 $this->numOfFailedTests ? 'red' : 'green',
                 $this->numOfFailedTests,
                 ngettext('assertion', 'assertions', $this->numOfFailedTests),
@@ -262,6 +257,7 @@ class TestHelper
             )
         );
         $this->printText('<blue>Test duration: </blue><yellow>' . $execTime . 's</yellow>');
+        $this->printText('<blue>Test memory: </blue><yellow>' . $this->getReadableSize(memory_get_peak_usage()) . '</yellow>');
 
         if ($this->numOfFailedTests) {
             exit(1);
@@ -554,11 +550,13 @@ class TestHelper
             }
             $pool->deleteItems(array_keys($cacheItems));
 
-            if(count(array_filter(array_map(fn(ExtendedCacheItemInterface $item) => $item->isHit(), $pool->getItems([$cacheKey, $cacheKey2])))) === 0) {
+            $cacheHits = array_filter(array_map(fn(ExtendedCacheItemInterface $item) => $item->isHit(), $pool->getItems([$cacheKey, $cacheKey2])));
+            if(count($cacheHits) === 0) {
                 $this->assertPass('The cache items does no longer exists in pool.');
             } else {
-                $this->assertFail('The cache items still exists in pool.');
-                return;
+                $this->assertFail(sprintf(
+                    'The cache items %s still exists in pool.', implode(', ', array_map(fn(ExtendedCacheItemInterface $item) => $item->getKey(), $cacheHits))
+                ));
             }
         }
 
@@ -710,5 +708,16 @@ class TestHelper
             ->setUseStaticItemCaching(false);
 
         return $configurationOption;
+    }
+
+    protected function setErrorHandler(int $errorLevels = E_ALL): void
+    {
+        set_error_handler([$this, 'errorHandler'], $errorLevels);
+    }
+
+    protected function getReadableSize(int $bytes, int $decimals = 1) {
+        $sz = 'BKMGTP';
+        $factor = floor((strlen((string) $bytes) - 1) / 3);
+        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . ($sz[$factor] ?? '') . 'o';
     }
 }
