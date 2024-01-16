@@ -365,9 +365,9 @@ class TestHelper
      */
     public function debugEvents(EventManagerInterface $eventManager): void
     {
-        $eventManager->onEveryEvents(
-            function (string $eventName) {
-                $this->printDebugText("Triggered event '$eventName'");
+        $eventManager->addGlobalListener(
+            function (Event\EventInterface $event) {
+                $this->printDebugText("Triggered event: " . $event::getName());
             },
             'debugCallback'
         );
